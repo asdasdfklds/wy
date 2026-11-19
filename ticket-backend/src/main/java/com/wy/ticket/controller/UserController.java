@@ -2,7 +2,9 @@ package com.wy.ticket.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wy.ticket.common.Result;
 import com.wy.ticket.dto.LoginRequest;
+import com.wy.ticket.dto.LoginResponse;
 import com.wy.ticket.entity.User;
 
 import jakarta.validation.Valid;
@@ -20,7 +22,7 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping ("/login")
-    public User login( @RequestBody @Valid LoginRequest loginRequest) {
-        return userService.login(loginRequest);
+    public Result<LoginResponse> login( @RequestBody @Valid LoginRequest loginRequest){
+        return Result.success(userService.login(loginRequest));
     }
 }
