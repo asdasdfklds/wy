@@ -21,12 +21,12 @@ public class UserService {
     public User login(LoginRequest loginRequest) {
         User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUsername, loginRequest.getUsername()));
         if (user == null) {
-           return null;
+           throw new IllegalArgumentException("用户名不存在");
         }
         if (!user.getPassword().equals(loginRequest.getPassword())) {
-            return user;
+            throw new IllegalArgumentException("密码错误");
         }
-        return null;
+        return user;
     }   
 }
 
