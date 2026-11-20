@@ -34,13 +34,14 @@ public class TicketService {
         if (dateTo != null && !dateTo.equals("")) {
             queryWrapper.le("create_date", dateTo + " 23:59:59");
         }
+        //new Page<>(page, size)指定是第几个总条数。 表示分页参数，page 是当前页码，size 是每页显示的记录数
+        //queryWrapper 是查询条件，selectPage 方法会根据这些条件查询数据库，并返回一个 Page 对象，里面包含了查询结果和分页信息。
         Page<Ticket> ticketPage = ticketMapper.selectPage(new Page<>(page, size), queryWrapper);
         PageData<Ticket> pageData = new PageData<>();
         pageData.setTotal(ticketPage.getTotal());
         pageData.setList(ticketPage.getRecords());
         return pageData;
     }
-
 
     public Ticket getTicketDetail(Long ticketId) {
         Ticket ticket = ticketMapper.selectById(ticketId);
