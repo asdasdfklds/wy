@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TicketApplication",
+            "request": "launch",
+            "mainClass": "com.wy.ticket.TicketApplication",
+            "projectName": "ticket-backend"
+        },
+        {
+            "name": "Ticket Agent (Python)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "app.main",
+            "cwd": "${workspaceFolder}/ticket-agent",
+            "python": "${workspaceFolder}/ticket-agent/.venv/Scripts/python.exe",
+            "console": "integratedTerminal"
+        }
+    ]
+}

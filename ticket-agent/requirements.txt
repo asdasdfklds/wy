@@ -1,0 +1,100 @@
+# ============================================================
+# AI Agent 服务依赖 —— FastAPI + LangChain + Milvus
+#
+# 安装：pip install -r requirements.txt
+# 环境：Python 3.13.7（版本号跨平台通用）
+#
+# 本文件只列「代码里真正用到」的包，已逐个核对 app/**/*.py 的 import；
+# 版本号取自当前 .venv 实测可用的版本。
+#
+# 需要完全一致的依赖闭包（106 个包，含 torch/transformers 等重传递依赖）时用：
+#   pip install -r requirements.lock.txt
+# ============================================================
+
+
+# ---------- Web 框架 ----------
+# main.py / routes/*.py: from fastapi import FastAPI, APIRouter, HTTPException, Request
+fastapi==0.115.0
+
+# main.py 末尾 `if __name__ == "__main__": import uvicorn` —— 启动 HTTP 服务
+uvicorn[standard]==0.30.6
+
+# schemas.py: BaseModel/Field；chat_agent.py: PrivateAttr
+pydantic==2.9.2
+
+# config.py: from pydantic_settings import BaseSettings, SettingsConfigDict
+# 它负责从 .env 读配置（SettingsConfigDict(env_file=".env")）
+pydantic-settings==2.10.1
+
+
+# ---------- LangChain 框架 ----------
+# ⚠ 版本约束说明（重要，别随手降级）：
+#   必须 langchain >= 1.3。langchain < 1.3 会把 langgraph 钉在 < 1.1.0，
+#   而 langgraph.prebuilt 需要 >= 1.2 才有的 ExecutionInfo 符号 —— 上游打包 bug，
+#   任何 pip 解析都装不出可用的官方 Agent。
+#   本项目实测组合：langchain 1.3.18 + langgraph 1.2.16 + langgraph-prebuilt 1.1.1
+langchain==1.3.18
+
+# chat_agent.py: from langchain.agents import create_agent
+#   —— 由 langchain 1.3.18 提供（上面的版本约束就是为它服务的）
+
+# agent.py / tools.py / chat_agent.py / tools_chat.py:
+#   langchain_core.messages（HumanMessage/SystemMessage/AIMessage/BaseMessage/ToolMessage）
+#   langchain_core.tools（@tool 装饰器、BaseTool）
+#   是上面 langchain 的硬依赖，此处显式钉住，防止被其它包降级
+langchain-core==1.6.12
+
+# llm.py: from langchain_openai import ChatOpenAI
+#   —— OpenAI 兼容协议，国产大模型（DeepSeek/通义/智谱…）改 .env 里的
+#      OPENAI_API_BASE 即可，不用换包
+langchain-openai==1.7.2
+
+# llm.py: from langchain_huggingface import HuggingFaceEmbeddings
+langchain-huggingface==1.2.3
+
+
+# ---------- 向量库 ----------
+# vector_store.py: from pymilvus import DataType, MilvusClient
+pymilvus==2.6.17
+
+# vector_store.py: import numpy as np（拼接向量 / 算余弦相似度）
+numpy==2.5.4
+
+
+# ---------- Embedding 模型 ----------
+# 注意：这是 langchain-huggingface 的「软依赖」——pip 不会自动装！
+#   HuggingFaceEmbeddings 在首次 encode 时才 `import sentence_transformers`
+#   （langchain_huggingface/embeddings/huggingface.py:60,104），
+#   缺它会在第一次向量化时直接报错，所以必须显式写进 requirements。
+#   本地模型 all-MiniLM-L6-v2 = 384 维，已缓存在 app/models/ 下。
+#   想换成 OpenAI / 代理向量时，注释掉本行并改 .env 的 EMBEDDING_* 即可。
+sentence-transformers==6.1.0
+
+# 若改用远程向量（上面的 sentence-transformers 不装），再解开这两行：
+# openai>=1.0.0
+# （langchain-openai 自带 openai 依赖，通常无需单独写）
+
+
+# ---------- 工具 / 回调 ----------
+# tools_chat.py: import requests —— Agent 反向调用 SpringBoot
+requests==2.32.5
+
+# tools_chat.py: import jwt —— 反向调用时签发内部令牌
+#   HS256，密钥取 .env 的 JWT_SECRET，必须与后端 sa-token.jwt-secret-key 一致，否则回调全 401
+#   令牌载荷要按 Sa-Token 的约定写（loginType / loginId / eff / role），后端才认
+PyJWT==2.9.0
+
+
+# ---------- 关键传递依赖（显式钉住，保证版本不漂移） ----------
+# langchain-core 的硬依赖（@tool 重试机制走它），代码未直接 import
+tenacity==8.5.0
+
+# pydantic-settings 的硬依赖，config.py 的 env_file=".env" 靠它真正读盘
+python-dotenv==1.0.1
+
+
+# ---------- 可选（代码目前未用到，按需解开） ----------
+# starlette/formparsers.py 里是 try: import multipart / except ModuleNotFoundError，
+#   属于软导入；本项目没有 Form()/File()/UploadFile 路由，装不装都能跑。
+#   以后要加「文件上传」类接口时再放开。
+# python-multipart==0.0.9
