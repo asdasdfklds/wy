@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wy.ticket.common.PageData;
 import com.wy.ticket.common.Result;
+import com.wy.ticket.dto.TicketSubmitRequest;
 import com.wy.ticket.entity.Ticket;
 import com.wy.ticket.mapper.TicketMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,19 @@ public class TicketService {
 
     public Ticket getTicketDetail(Long ticketId) {
         Ticket ticket = ticketMapper.selectById(ticketId);
+        return ticket;
+    }
+
+    public Ticket submit(TicketSubmitRequest request) {
+        Ticket ticket = new Ticket();
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setFaultType(request.getFaultType());
+        ticket.setStatus("PENDING");
+        ticket.setSubmitterId(Long.parseLong(StpUtil.getLoginId().toString()));
+        ticket.setCreateTime(LocalDateTime.now());
+        ticket.setUpdateTime(LocalDateTime.now());
+        ticketMapper.insert(ticket);
         return ticket;
     }
 
