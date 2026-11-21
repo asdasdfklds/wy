@@ -55,7 +55,7 @@ public class TicketService {
         ticket.setDescription(request.getDescription());
         ticket.setFaultType(request.getFaultType());
         ticket.setStatus("PENDING");
-        ticket.setSubmitterId(Long.parseLong(StpUtil.getLoginId().toString()));
+        ticket.setSubmitterId(StpUtil.getLoginIdAsLong());
         ticket.setCreateTime(LocalDateTime.now());
         ticket.setUpdateTime(LocalDateTime.now());
         ticketMapper.insert(ticket);
