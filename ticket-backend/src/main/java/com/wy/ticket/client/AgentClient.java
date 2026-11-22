@@ -26,7 +26,6 @@ public class AgentClient {
     
     public Boolean addKnowledge(KnowledgeAddRequest request) {
         ResponseEntity<Boolean> result = restTemplate.postForEntity(baseUrl + "/knowledge/add", request, Boolean.class);
-
         return result.getBody();
     }
 
