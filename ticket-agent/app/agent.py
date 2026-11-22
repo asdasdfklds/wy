@@ -65,6 +65,7 @@ def run_agent(title, description, fault_type):
     检索结果一并返回，路由层直接复用，不要再查一遍（每次检索都要算一次嵌入）。
     """
     llm = get_llm()
+    #os.getenv(...) 读取配置里的集合名，`get_milvus_store(...)` 拿到操作该集合的对象。`knowledge_store` 用来查知识库，`ticket_store` 用来查历史工单
     knowledge_store = get_milvus_store(os.getenv("MILVUS_KNOWLEDGE"))
     ticket_store = get_milvus_store(os.getenv("MILVUS_TICKET"))
     if fault_type not in ["network", "hardware", "software", "account"]:
@@ -72,6 +73,7 @@ def run_agent(title, description, fault_type):
     full_query = f"{title}\n{description}"
     # 知识库按相似度阈值过滤，低于阈值的直接不返回（没有就是没有，别硬凑）
     knowledge_result = knowledge_store.search(full_query, 1, min_score=KNOWLEDGE_MIN_SCORE)
+    #最多取 3 条相似工单，最低分是 0.75。所以实际查到的条数可能更少。
     ticket_result = ticket_store.search(full_query, 3, 0.75)
     knowledge_line = "\n".join(
         f"- 相似度{r['score']} {r['title']}:{r['content']}" for r in knowledge_result

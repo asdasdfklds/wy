@@ -193,12 +193,17 @@ class MilvusStore:
         1. pymilvus 的 MilvusClient.search 只认 limit 参数，写 top_k 会被静默忽略（一直按默认 10 条返回）；
         2. 标量字段在 hit["entity"] 里、distance 在 hit 顶层，直接 hit.get("title") 拿到的全是 None。
         """
+        """"将查询操作转换为向量"""
         vec = self._embedding.embed_query(query)
         results = self.client.search(
+            ##去哪个集合查找
             collection_name=self.collection_name,
+            ##拿什么去找
             data=[vec],
+            #跟哪一列比较。
             anns_field=VECTOR_FIELD,
             limit=top_k,
+            #每条记录带回哪些字段
             output_fields=self._fields,
         )
         print(results)
