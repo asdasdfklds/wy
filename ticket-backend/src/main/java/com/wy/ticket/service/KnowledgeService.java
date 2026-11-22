@@ -1,10 +1,12 @@
 package com.wy.ticket.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wy.ticket.client.AgentClient;
 import com.wy.ticket.common.Result;
 import com.wy.ticket.dto.KnowledgeAddRequest;
@@ -38,6 +40,12 @@ public class KnowledgeService {
         boolean ok = agentClient.addKnowledge(request);
         log.info("知识库{}同步到Agent{}",knowledge.getId(),ok?"成功":"失败");
         return Result.success(knowledge);
+    }
+
+    public Result<List<Knowledge>> getKonwledgelist(){
+        List<Knowledge> knowledgeList = knowledgeMapper.selectList(Wrappers.lambdaQuery(Knowledge.class));
+        return Result.success(knowledgeList);
+
     }
 
 
