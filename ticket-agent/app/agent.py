@@ -27,16 +27,13 @@ CLASSIFY_PROMPT = """你是故障分类助手。请把下面的工单描述归�
     工单描述：{description}
     """
 
-
+#从大模型回复里提取 JSON，让 Python 能读取里面的字段
 def _safe_json(text: str):
-    """
-    从 LLM 输出中抠出 JSON
-    返回 (parsed_dict, used_fallback)；used_fallback=True 表示解析失败、走兜底
-    """
     text = text.strip()
     # 移除可能的代码块
     text = re.sub(r"^```(json)?", "", text).rstrip("`").strip()
     try:
+        #直接解析整段文字。 json.loads(text) 把 JSON 字符串转换成 Python 对象。比如 '{"fault_type":"hardware"}' 会变成一个字典。成功就返回 (字典, False)
         return json.loads(text), False
     except Exception:
         # 抓大括号
