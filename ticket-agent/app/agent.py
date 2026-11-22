@@ -109,3 +109,7 @@ def run_agent(title, description, fault_type):
 def search_similar(collection_name: str, full_query: str, top_k: int, min_score: float = 0.0):
     store = get_milvus_store(collection_name)
     return store.search(full_query, top_k, min_score=min_score)
+
+def insert_ticket(id: int, title: str, description: str, fault_type: str):
+    store = get_milvus_store(os.getenv("MILVUS_TICKET"))
+    store.insert(id, title, description, fault_type)
