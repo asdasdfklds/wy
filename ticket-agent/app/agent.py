@@ -106,3 +106,6 @@ def run_agent(title, description, fault_type):
 
     return parsed, ticket_result, knowledge_result
 
+def search_similar(collection_name: str, full_query: str, top_k: int, min_score: float = 0.0):
+    store = get_milvus_store(collection_name)
+    return store.search(full_query, top_k, min_score=min_score)

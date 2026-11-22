@@ -31,7 +31,7 @@ public class KnowledgeController {
 
     @GetMapping
     public Result<List<Knowledge>> getKnowledgeList(){
-        return knowledgeService.getKonwledgelist();
+        return knowledgeService.getKnowledgeList();
     }
     
 }
