@@ -15,3 +15,17 @@ class KnowledgeAddRequest(BaseModel):
     title: str = Field(...)
     category: Optional[str] = Field(None)
     content: str = Field(...)
+
+class SimilarItem(BaseModel):
+    id: int
+    title: str
+    content: str
+    score: float
+
+class AnalyzeResponse(BaseModel):
+    fault_type: str = Field(...)
+    suggestion: str = Field(...)
+    similar_tickets: List[SimilarItem] = Field(default_factory=list)
+    similar_knowledge: List[SimilarItem] = Field(default_factory=list)
+
+

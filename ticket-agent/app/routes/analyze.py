@@ -1,8 +1,20 @@
 from fastapi import APIRouter
-from app.schemas import AnalyzeRequest
+from app.schemas import AnalyzeRequest, AnalyzeResponse
 from app.agent import run_agent
 
 router = APIRouter()
+
+
+def _to_items(row: list):
+    return [
+        SimilarItem(
+            id=int(r.get("item_id") or 0),
+            title=r.get("title") or "",
+            content=r.get("content") or "",
+            score=float(r.get("score", 0.0)),
+        ) for r in (row or [])
+    ]
+
 
 @router.post("/analyze")
 def analyze_ticket(req: AnalyzeRequest):
