@@ -10,6 +10,7 @@ import com.wy.ticket.common.PageData;
 import com.wy.ticket.common.Result;
 import com.wy.ticket.dto.AIAnalyzeResponse;
 import com.wy.ticket.dto.TicketSubmitRequest;
+import com.wy.ticket.dto.TicketUpdateRequest;
 import com.wy.ticket.entity.Ticket;
 import com.wy.ticket.mapper.TicketMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +75,16 @@ public class TicketService {
         ticketMapper.updateById(ticket);
 
         return ticket;
+    }
+
+    public Result<Ticket> updateTicket(Long id, TicketUpdateRequest req) {
+    Ticket ticket = ticketMapper.selectById(id);
+    ticket.setResolution(req.getResolution());
+    ticket.setStatus(req.getStatus());
+    ticketMapper.updateById(ticket);
+    Boolean ok = agentClient.updateTicket(ticket);
+    log.info("update ticket ok:{}", ok);
+    return Result.success(ticket);
     }
 
 }

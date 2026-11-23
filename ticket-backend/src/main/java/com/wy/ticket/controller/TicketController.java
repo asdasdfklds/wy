@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wy.ticket.common.PageData;
 import com.wy.ticket.common.Result;
 import com.wy.ticket.dto.TicketSubmitRequest;
+import com.wy.ticket.dto.TicketUpdateRequest;
 import com.wy.ticket.entity.Ticket;
 import com.wy.ticket.service.TicketService;
 
@@ -37,4 +39,8 @@ public class TicketController {
         return Result.success(ticketService.submit(request));
     }
 
+    @PutMapping("/{id}")
+    public Result<Ticket> update(@PathVariable Long id, @RequestBody TicketUpdateRequest request) {
+        return ticketService.updateTicket(id, request);
+    }
 }

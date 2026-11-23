@@ -7,7 +7,7 @@ load_dotenv()  # 先加载 .env，后面各模块初始化时读到的才是真�
 from app.routes.analyze import router as analyze_router
 from app.routes.knowledge import router as knowledge_router
 from app.routes.chat import router as chat_router
-
+from app.routes.ticket import router as ticket_router
 
 import uvicorn
 
@@ -15,6 +15,7 @@ app = FastAPI()
 app.include_router(analyze_router)
 app.include_router(knowledge_router)
 app.include_router(chat_router)
+app.include_router(ticket_router)
 
 @app.get("/")
 def health_check():

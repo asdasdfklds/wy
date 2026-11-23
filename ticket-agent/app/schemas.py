@@ -61,3 +61,11 @@ class ChatResponse(BaseModel):
     tool_calls: List[ToolCallRecord] = Field(default_factory=list)
     session_id: str = Field(..., description="回传 sessionId")
     finished: bool = Field(True, description="是否正常结束；False 表示出错降级")
+
+
+class TicketUpdateRequest(BaseModel):
+    item_id: int = Field(...)
+    title: str = Field(...)
+    fault_type: Optional[str] = Field(None)
+    description: str = Field(...)
+    resolution:str = Field(...)

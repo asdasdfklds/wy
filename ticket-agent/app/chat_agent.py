@@ -107,7 +107,12 @@ def run_chat(session_id:str,message:str):
         finished = False
         reply = _last_ai_text(collected)
 
-
+    if finished:
+        reply = _last_ai_text(collected)
+        if not reply:
+            finished = False
+            reply = "AI 未返回任何有用信息"
+            
     tool_calls = _dedupe_tool_calls(_extract_tool_calls(collected))
 
     _append_history(session_id,AIMessage(content=reply))

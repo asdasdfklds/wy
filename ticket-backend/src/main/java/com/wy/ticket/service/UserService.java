@@ -16,20 +16,21 @@ import cn.dev33.satoken.stp.StpUtil;
 @Service 
 public class UserService {
 
-   @Autowired
-   private UserMapper userMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     public LoginResponse login(LoginRequest loginRequest) {
         User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUsername, loginRequest.getUsername()));
         if (user == null) {
-           throw new IllegalArgumentException("用户名不存在");
+           return null;
         }
         if (!user.getPassword().equals(loginRequest.getPassword())) {
-            throw new IllegalArgumentException("密码错误");
+            return null;
         }
         StpUtil.login(user.getId());
         String token = StpUtil.getTokenValue();
         return LoginResponse.form(user, token);
+
     }   
 }
 
