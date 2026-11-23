@@ -23,3 +23,8 @@ def delete_knowledge(id: int):
     store.delete(id)
     return True
 
+@router.delete("/knowledge/{id}")
+def delete_knowledge(id: int):
+    store = get_milvus_store(os.getenv("MILVUS_KNOWLEDGE"))
+    store.delete(id)
+    return True

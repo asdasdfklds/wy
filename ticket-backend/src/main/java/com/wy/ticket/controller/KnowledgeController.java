@@ -7,12 +7,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wy.ticket.client.AgentClient;
 import com.wy.ticket.common.Result;
 import com.wy.ticket.dto.KnowledgeAddRequest;
 import com.wy.ticket.entity.Knowledge;
+import com.wy.ticket.mapper.KnowledgeMapper;
 import com.wy.ticket.service.KnowledgeService;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -24,6 +28,8 @@ public class KnowledgeController {
     @Autowired 
     private KnowledgeService knowledgeService;
     
+
+
     @PostMapping
     public Result<Knowledge> addKnowledge(@RequestBody KnowledgeAddRequest request) {
         return knowledgeService.addKnowledge(request);
@@ -33,5 +39,10 @@ public class KnowledgeController {
     public Result<List<Knowledge>> getKnowledgeList(){
         return knowledgeService.getKnowledgeList();
     }
-    
+
+
+    @DeleteMapping("/{id}")
+    public Result<Void> deleteKnowledge(@PathVariable long id) {
+        return knowledgeService.deleteKnowledge(id);
+    }
 }
