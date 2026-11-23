@@ -4,7 +4,7 @@ from typing import Dict, List
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from app import agent
 from app.llm import get_llm
-from app.tools import CHAT_TOOLS
+from app.tools import CHAT_TOOLS, WRITE_TOOLS
 from langchain.agents import create_agent
 
 # ====================================================================
