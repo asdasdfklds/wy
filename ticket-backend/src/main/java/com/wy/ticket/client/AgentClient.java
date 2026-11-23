@@ -1,6 +1,7 @@
 package com.wy.ticket.client;
 
 
+import com.wy.ticket.dto.ChatRequest;
 import com.wy.ticket.dto.KnowledgeAddRequest;
 import com.wy.ticket.entity.Ticket;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,13 @@ public class AgentClient {
         return true;
     }
 
-
+    public Object chat(ChatRequest chatRequest) {
+        Map<String, String> param = new HashMap<>();
+        param.put("session_id", chatRequest.getSessionId());
+        param.put("message", chatRequest.getMessage());
+        ResponseEntity<Object> result = restTemplate.postForEntity(baseUrl + "/chat", param, Object.class);
+        return result.getBody();
+    }
 
     public Boolean updateTicket(Ticket ticket) {
         Map<String, Object> param = new HashMap<>();

@@ -5,8 +5,10 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wy.ticket.client.AgentClient;
 import com.wy.ticket.common.PageData;
 import com.wy.ticket.common.Result;
+import com.wy.ticket.dto.AIAnalyzeResponse;
 import com.wy.ticket.dto.TicketSubmitRequest;
 import com.wy.ticket.entity.Ticket;
 import com.wy.ticket.mapper.TicketMapper;
@@ -23,6 +25,9 @@ public class TicketService {
 
     @Autowired
     private TicketMapper ticketMapper;
+
+    @Autowired
+    private AgentClient agentClient;
 
     public PageData<Ticket> getPageData(int page, int size, String status, String dateFrom, String dateTo) {
         QueryWrapper<Ticket> queryWrapper = new QueryWrapper<Ticket>();
@@ -59,6 +64,15 @@ public class TicketService {
         ticket.setCreateTime(LocalDateTime.now());
         ticket.setUpdateTime(LocalDateTime.now());
         ticketMapper.insert(ticket);
+          //调用AI agent
+        Object result = agentClient.analyzeTicket(ticket);
+        AIAnalyzeResponse response = JSON.parseObject(JSON.toJSONString(result), AIAnalyzeResponse.class);
+        ticket.setSimilarTickets(response.getSimilarTickets());
+        ticket.setSimilarKnowledge(response.getSimilarKnowledge());
+        ticket.setFaultType(response.getFaultType());
+        ticket.setAiSuggestion(response.getSuggestion());
+        ticketMapper.updateById(ticket);
+
         return ticket;
     }
 

@@ -10,7 +10,7 @@ spring:
     username: root
     password: 214325
 
-  sa-token:
+sa-token:
   # token 名称（同时也是 cookie 名称）
   token-name: Authorization
   token-prefix: Bearer
@@ -28,4 +28,5 @@ spring:
   is-log: true
 
 agent:
+  token: ticket-please-change-me-2026
   base-url: http://localhost:8000

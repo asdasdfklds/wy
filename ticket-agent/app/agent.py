@@ -1,8 +1,7 @@
 import json
 import os
 import re
-
-from app.vector_store import get_milvus_store
+from app.vector_store import get_milvus_store, KNOWLEDGE_MIN_SCORE
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
