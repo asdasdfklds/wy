@@ -1,6 +1,7 @@
 from datetime import datetime
+import json
 from typing import Dict, List
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from app import agent
 from app.llm import get_llm
 from app.tools import CHAT_TOOLS
@@ -40,6 +41,47 @@ def _append_history(session_id: str, msg: BaseMessage):
         _sessions[session_id] = []
     _sessions[session_id].append(msg)
 
+def _last_ai_text(messages: List[BaseMessage]) -> str:
+    for m in reversed(messages):
+        if isinstance(m, AIMessage) and not m.tool_calls:
+            text = m.content if isinstance(m.content, str) else str(m.content)
+            if text.strip():
+                return text.strip()
+    return "AI 未返回任何有用信息"
+
+
+def _is_tool_success(content: str) -> bool:
+    return "error" not in content and "失败" not in content
+
+def _extract_tool_calls(messages: List[BaseMessage]) -> List[Dict]:
+    result_by_call_id: Dict[str, ToolMessage] = {
+        m.tool_call_id: m for m in messages
+        if isinstance(m, ToolMessage) and getattr(m, 'tool_call_id', None)
+    }
+    records: List[Dict] = []
+    for m in messages:
+        if not isinstance(m, AIMessage) or not m.tool_calls:
+            continue
+        for tc in m.tool_calls:
+            tm = result_by_call_id.get(tc.get("id"), "")
+            obs = tm.content if tm is not None else ""
+            obs = obs if isinstance(obs, str) else str(obs)
+            records.append({
+                "tool": tc.get("name", ""),
+                "args": tc.get("args") or {},
+                "result_preview": obs[:200],
+                "need_confirm": tc.get("name", "") in WRITE_TOOLS,
+                "success": _is_tool_success(obs)
+            })
+    return records
+
+def _dedupe_tool_calls(records: List[Dict]) -> List[Dict]:
+    latest: Dict[tuple, Dict] = {}
+    for record in records:
+        key = (record['tool'], json.dumps(record.get("args") or {}, sort_keys=True, ensure_ascii=False))
+        if key not in latest or record.get("success"):
+            latest[key] = record
+    return list(latest.values())
 
 
 def run_chat(session_id:str,message:str):
@@ -54,5 +96,25 @@ def run_chat(session_id:str,message:str):
             weekday=now.strftime("%A")
         )
     )
+    collected: List[BaseMessage] = []
+    finished: bool = True
+    reply = ""
 
-agent.stream({"messages":[*history,HumanMessage()]})
+    try:
+        for trunk in agent.stream({"messages": [*history, HumanMessage(content=message)]}, stream_mode="values"):
+            collected = trunk.get("messages", [])
+    except Exception as err:
+        finished = False
+        reply = _last_ai_text(collected)
+
+
+    tool_calls = _dedupe_tool_calls(_extract_tool_calls(collected))
+
+    _append_history(session_id,AIMessage(content=reply))
+
+    return {
+        "reply": reply,
+        "tool_calls": tool_calls,
+        "finished": finished,
+        "session_id": session_id,
+    }

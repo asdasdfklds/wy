@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.schemas import AnalyzeRequest, AnalyzeResponse
-from app.agent import run_agent
+from app.schemas import AnalyzeRequest, AnalyzeResponse, SimilarItem
+from app.agent import insert_ticket, run_agent
 
 router = APIRouter()
 
