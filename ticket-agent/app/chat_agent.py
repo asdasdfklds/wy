@@ -1,4 +1,9 @@
+from datetime import datetime
+from typing import Dict, List
+from langchain_core.messages import BaseMessage
+from app import agent
 from app.llm import get_llm
+from app.tools import CHAT_TOOLS
 from langchain.agents import create_agent
 
 # ====================================================================
@@ -24,10 +29,30 @@ SYSTEM_PROMPT = """你是企业 IT 运维系统的 AI 助手。你可以通过�
     5. 知识库检索（query_knowledge / query_history_tickets）只取最相关的 1 条，不要传 top_k 参数
     6. 最终回复用中文，简洁清晰"""
 
+_sessions: Dict[str, List[BaseMessage]] = {}
+
+
+def _get_history(session_id: str) -> List[BaseMessage]:
+    return list(_sessions.get(session_id, []))
+
+def _append_history(session_id: str, msg: BaseMessage):
+    if session_id not in _sessions:
+        _sessions[session_id] = []
+    _sessions[session_id].append(msg)
+
+
+
 def run_chat(session_id:str,message:str):
+    history = _get_history(session_id)
+    now =datetime.now()
 
     agent = create_agent(
-        model =get_llm().
+        model =get_llm(),
         tools=CHAT_TOOLS,
-        system_prompt=
+        system_prompt=SYSTEM_PROMPT.format(
+            today=now.strftime("%Y-%m-%d"),
+            weekday=now.strftime("%A")
+        )
     )
+
+agent.stream({"messages":[*history,HumanMessage()]})
