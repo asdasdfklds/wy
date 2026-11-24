@@ -42,6 +42,26 @@ flowchart TB
 ![工单列表展示演示工单、状态和分页](docs/images/ticket-list.png)
 
 <details>
+<summary>提交工单、AI 建议与相似工单</summary>
+
+**填写工单**
+
+![填写摄像头故障的类型、标题和描述](docs/images/ticket-submit.png)
+
+**查看提交后的分析结果**
+
+![工单详情展示 AI 初步建议、相似历史工单和知识库参考](docs/images/ticket-analysis.png)
+
+</details>
+
+<details>
+<summary>AI 助手查询工单</summary>
+
+![向 AI 助手查询同一条工单的状态和排查建议](docs/images/ai-assistant.png)
+
+</details>
+
+<details>
 <summary>查看知识库管理界面</summary>
 
 ![知识库管理界面展示新增表单和排障条目](docs/images/knowledge-base.png)
